@@ -22,5 +22,12 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+    time-zone: UTC
+  mvc:
+    format:
+      date-time: iso
+
 server:
   port: 8080
