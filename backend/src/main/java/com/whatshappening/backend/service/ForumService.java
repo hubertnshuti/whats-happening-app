@@ -12,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+//for notifications
+import com.whatshappening.backend.repository.UserRepository;
+import com.whatshappening.backend.entity.Notification;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -29,6 +32,10 @@ public class ForumService {
     private final ForumMessageRepository messageRepository;
     private final MessageReactionRepository reactionRepository;
     private final ForumQuestionRepository questionRepository;
+
+//    for notifications
+    private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
     // Called by EventService when an event is published
     @Transactional
@@ -107,6 +114,24 @@ public class ForumService {
                 .build();
         ForumMessage saved = messageRepository.save(message);
         forum.setLastActivityAt(LocalDateTime.now());
+
+//        this code block before return statement is for notification
+
+        String linkUrl = "/events/" + forum.getEvent().getId();
+        for (ForumMember m : memberRepository.findByForumAndNotificationsEnabledTrue(forum)) {
+            if (!m.getUser().getId().equals(author.getId())) { // don't notify yourself
+                notificationService.notify(
+                        m.getUser(),
+                        Notification.Type.FORUM_MESSAGE,
+                        "New " + saved.getMessageType().name().toLowerCase().replace('_', ' ') + " for " + forum.getEvent().getTitle(),
+                        saved.getContent().length() > 200 ? saved.getContent().substring(0, 200) + "…" : saved.getContent(),
+                        linkUrl,
+                        forum.getEvent()
+                );
+            }
+        }
+
+
         return toMessageResponse(saved);
     }
 
@@ -180,6 +205,18 @@ public class ForumService {
         q.setAnsweredAt(LocalDateTime.now());
         q.setStatus(ForumQuestion.Status.ANSWERED);
         q.getForum().setLastActivityAt(LocalDateTime.now());
+
+//        this code block is for notifications
+
+        notificationService.notify(
+                q.getAsker(),
+                Notification.Type.FORUM_QUESTION_ANSWERED,
+                "Your question was answered",
+                req.getAnswer().length() > 200 ? req.getAnswer().substring(0, 200) + "…" : req.getAnswer(),
+                "/events/" + q.getForum().getEvent().getId(),
+                q.getForum().getEvent()
+        );
+
         return toQuestionResponse(q);
     }
 
