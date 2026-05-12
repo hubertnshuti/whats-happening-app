@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface EventReportRepository extends JpaRepository<EventReport, UUID> {
     boolean existsByEventAndReporter(Event event, User reporter);
     Page<EventReport> findByStatusOrderByCreatedAtAsc(EventReport.Status status, Pageable pageable);
+    long countByStatus(EventReport.Status status);
 }

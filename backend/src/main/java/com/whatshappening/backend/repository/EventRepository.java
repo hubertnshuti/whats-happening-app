@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.time.LocalDateTime;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,4 +23,7 @@ public interface EventRepository
     Page<Event> findByOrganizer(User organizer, Pageable pageable);
 
     boolean existsBySlug(String slug);
+
+    long countByStatus(EventStatus status);
+    long countByStatusAndStartAtAfter(EventStatus status, LocalDateTime from);
 }
