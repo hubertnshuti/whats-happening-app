@@ -1,14 +1,17 @@
 app:
   jwt:
-    secret: 5f4dcc3b5aa765d61d8327deb882cf99c0a6e7d9b8f4a23c5e1d6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8
+    secret: ${JWT_SECRET:dev-only-secret-do-not-use-in-prod-5f4dcc3b5aa765d61d8327deb882cf99c0a6e7d9b8f4a23c5e1d6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8}
     access-token-expiration-ms: 900000        # 15 minutes
     refresh-token-expiration-ms: 604800000    # 7 days
-
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+    api-key: ${CLOUDINARY_API_KEY:}
+    api-secret: ${CLOUDINARY_API_SECRET:}
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/whats_happening
-    username: postgres
-    password: 1234
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:1234}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -28,6 +31,10 @@ spring:
   mvc:
     format:
       date-time: iso
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 server:
   port: 8080
