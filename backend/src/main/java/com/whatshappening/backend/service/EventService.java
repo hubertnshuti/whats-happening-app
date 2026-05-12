@@ -26,6 +26,8 @@ public class EventService {
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
     private final SlugService slugService;
+//    This is to add forum upon event creation
+    private final ForumService forumService;
 
     @Transactional
     public EventResponse createEvent(CreateEventRequest req, User organizer) {
@@ -130,6 +132,7 @@ public class EventService {
             throw new ApiException("Only draft events can be published", HttpStatus.BAD_REQUEST);
         }
         event.setStatus(EventStatus.PUBLISHED);
+        forumService.ensureForumForEvent(event);
         return toResponse(event);
     }
 
