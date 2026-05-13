@@ -44,7 +44,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${displayFont.variable} ${bodyFont.variable}`}
     >
-      <body className="bg-app text-fg antialiased">
+      <body className="bg-app text-fg antialiased" suppressHydrationWarning>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

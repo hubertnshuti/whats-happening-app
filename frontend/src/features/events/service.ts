@@ -1,27 +1,22 @@
 import { api } from "@/lib/api";
 import type { PageResponse } from "@/types/api";
-import type {
-  EventDetail,
-  EventListParams,
-  EventSummary,
-} from "./types";
+import type { EventDetail, EventListParams, EventSummary } from "./types";
 
+/** Matches backend CreateEventRequest DTO exactly */
 export interface CreateEventBody {
   title: string;
   shortDescription?: string;
   description?: string;
   categoryId: string;
-  locationName?: string;
-  address?: string;
-  city?: string;
-  startAt: string;
+  locationId?: string;        // UUID of a saved Location (optional)
+  customLocationText?: string; // OR free-text location
+  startAt: string;             // ISO datetime
   endAt: string;
-  isOnline?: boolean;
-  onlineLink?: string;
-  free?: boolean;
-  maxAttendees?: number;
+  isFree?: boolean;
+  priceInfo?: string;
+  capacity?: number;
   coverImageUrl?: string;
-  tags?: string[];
+  externalUrl?: string;
 }
 
 export const eventService = {
@@ -35,14 +30,15 @@ export const eventService = {
   create: (body: CreateEventBody) =>
     api.post<EventDetail>("/events", body),
 
+  /** Backend uses PATCH, not PUT */
   update: (id: string, body: Partial<CreateEventBody>) =>
-    api.put<EventDetail>(`/events/${id}`, body),
+    api.patch<EventDetail>(`/events/${id}`, body),
 
+  publish: (id: string) => api.post<EventDetail>(`/events/${id}/publish`),
+  cancel: (id: string) => api.post<EventDetail>(`/events/${id}/cancel`),
   delete: (id: string) => api.delete<void>(`/events/${id}`),
 
-  myEvents: (params?: { page?: number; size?: number }) =>
-    api.get<PageResponse<EventSummary>>("/events/mine", params),
-
+  /** Real endpoint: GET /api/v1/me/saved-events */
   savedEvents: (params?: { page?: number; size?: number }) =>
-    api.get<PageResponse<EventSummary>>("/events/saved", params),
+    api.get<PageResponse<EventSummary>>("/me/saved-events", params),
 };

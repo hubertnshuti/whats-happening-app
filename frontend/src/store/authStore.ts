@@ -1,17 +1,12 @@
 import { create } from "zustand";
 import { tokenStorage } from "@/lib/tokenStorage";
-import { authService } from "@/features/auth/service";
-import type {
-  AuthUser,
-  LoginRequest,
-  RegisterRequest,
-} from "@/features/auth/types";
+import { api } from "@/lib/api";
+import type { AuthUser, LoginRequest, RegisterRequest, AuthResponse } from "@/features/auth/types";
 
 interface AuthState {
   user: AuthUser | null;
   isLoading: boolean;
   isHydrated: boolean;
-
   login: (body: LoginRequest) => Promise<void>;
   register: (body: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
@@ -26,7 +21,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   async login(body) {
     set({ isLoading: true });
     try {
-      const res = await authService.login(body);
+      const res = await api.post<AuthResponse>("/auth/login", body);
       tokenStorage.setTokens(res.accessToken, res.refreshToken);
       set({ user: res.user });
     } finally {
@@ -37,7 +32,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   async register(body) {
     set({ isLoading: true });
     try {
-      const res = await authService.register(body);
+      const res = await api.post<AuthResponse>("/auth/register", body);
       tokenStorage.setTokens(res.accessToken, res.refreshToken);
       set({ user: res.user });
     } finally {
@@ -46,26 +41,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   async logout() {
+    const refreshToken = tokenStorage.getRefresh();
     try {
-      await authService.logout();
-    } catch {
-      /* ignore — clear locally anyway */
-    }
+      // Backend requires the refresh token in the body
+      if (refreshToken) {
+        await api.post<void>("/auth/logout", { refreshToken });
+      }
+    } catch { /* ignore — clear locally anyway */ }
     tokenStorage.clear();
     set({ user: null });
   },
 
-  /**
-   * Called once on app startup. If a token exists, fetch /auth/me to
-   * confirm it's still valid and load the user. If anything fails, clear.
-   */
   async hydrate() {
     if (!tokenStorage.getAccess()) {
       set({ isHydrated: true });
       return;
     }
     try {
-      const user = await authService.me();
+      const user = await api.get<AuthUser>("/auth/me");
       set({ user, isHydrated: true });
     } catch {
       tokenStorage.clear();
