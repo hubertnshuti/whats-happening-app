@@ -9,7 +9,17 @@
       "Bash(Get-ChildItem -Recurse -Filter \"*.java\")",
       "Bash(npm run *)",
       "Bash(npm dedupe *)",
-      "Bash(npm ls *)"
+      "Bash(npm ls *)",
+      "Bash(curl -s -X POST http://localhost:8083/api/v1/auth/login -H \"Content-Type: application/json\" -d \"{\\\\\"email\\\\\":\\\\\"admin@whatshappening.com\\\\\",\\\\\"password\\\\\":\\\\\"Admin1234!\\\\\"}\")",
+      "Bash(curl *)",
+      "Bash(PGPASSWORD=1234 psql *)",
+      "PowerShell(Test-Path *)",
+      "Bash(java -version)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(netstat *)",
+      "PowerShell(Stop-Process *)",
+      "Bash(./mvnw.cmd spring-boot:run -q)",
+      "Bash(echo \"Backend starting in background, PID: $!\")"
     ]
   }
 }

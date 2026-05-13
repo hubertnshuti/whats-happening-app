@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
+import { ImageUploader } from "@/components/ui/ImageUploader";
 import { eventService } from "@/features/events/service";
 import { categoryService } from "@/features/categories/service";
 import { ApiException } from "@/lib/ApiException";
@@ -197,10 +198,20 @@ export default function CreateEventPage() {
                   {...register("priceInfo")} />
               )}
 
-              <Input label="Cover image URL" placeholder="https://res.cloudinary.com/…"
-                leftIcon={<ImageIcon className="size-4" />}
-                {...register("coverImageUrl")} error={errors.coverImageUrl?.message}
-                hint="Paste a public image URL" />
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-fg-secondary flex items-center gap-2">
+                  <ImageIcon className="size-4 text-fg-muted" /> Cover image
+                </label>
+                <ImageUploader
+                  purpose="event-covers"
+                  onChange={(url) => setValue("coverImageUrl", url, { shouldValidate: true })}
+                />
+                <details className="text-xs text-fg-muted">
+                  <summary className="cursor-pointer hover:text-brand">Or paste a URL instead</summary>
+                  <Input className="mt-2" placeholder="https://…"
+                    {...register("coverImageUrl")} error={errors.coverImageUrl?.message} />
+                </details>
+              </div>
 
               <Input type="number" label="Capacity" placeholder="e.g. 100"
                 leftIcon={<Users className="size-4" />}
