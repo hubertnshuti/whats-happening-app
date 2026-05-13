@@ -3,6 +3,7 @@ package com.whatshappening.backend.controller;
 import com.whatshappening.backend.dto.common.ApiResponse;
 import com.whatshappening.backend.dto.event.CreateEventRequest;
 import com.whatshappening.backend.dto.event.EventResponse;
+import com.whatshappening.backend.dto.event.EventSummary;
 import com.whatshappening.backend.dto.event.UpdateEventRequest;
 import com.whatshappening.backend.entity.User;
 import com.whatshappening.backend.exception.ApiException;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.data.domain.Page;
 
 import java.util.UUID;
 

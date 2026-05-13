@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { EventCard } from '@/features/events/components/EventCard';
 import { EmptyState, Spinner } from '@/components/ui/feedback';
-import { eventsService } from '@/features/events/service';
-import { categoriesService } from '@/features/categories/service';
+import { eventService } from '@/features/events/service';
+import { categoryService } from '@/features/categories/service';
 import { Search, Loader2, Clock, X, Compass } from 'lucide-react';
 import Link from 'next/link';
 
@@ -24,7 +24,7 @@ export default function SearchPage() {
     const saved = localStorage.getItem('recentSearches');
     if (saved) setRecentSearches(JSON.parse(saved));
     
-    categoriesService.list().then(res => setCategories(res.slice(0, 6))).catch(console.error);
+    categoryService.list().then(res => setCategories(res.slice(0, 6))).catch(console.error);
   }, []);
 
   const handleSearch = async (searchQuery: string) => {
@@ -40,7 +40,7 @@ export default function SearchPage() {
     localStorage.setItem('recentSearches', JSON.stringify(updatedRecents));
 
     try {
-      const res = await eventsService.list({ search: q, page: 0, size: 20 });
+      const res = await eventService.list({ search: q, page: 0, size: 20 });
       setResults(res.content);
     } catch (err) {
       console.error(err);

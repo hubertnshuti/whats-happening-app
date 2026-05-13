@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Calendar, Sparkles, Users } from "lucide-react";
 import { PublicShell } from "@/components/layout/PublicShell";
@@ -6,7 +8,11 @@ import { Chip } from "@/components/ui/Chip";
 import { Card } from "@/components/ui/Card";
 import { routes } from "@/config/routes";
 
+import { useAuthStore } from '@/store/authStore';
+
 export default function Home() {
+  const user = useAuthStore((s) => s.user);
+
   return (
     <PublicShell>
       {/* HERO */}
@@ -41,11 +47,11 @@ export default function Home() {
                   Browse events
                 </Button>
               </Link>
-              <Link href={routes.register}>
+              {!user && (<Link href={routes.register}>
                 <Button size="lg" variant="outline">
                   Create account
                 </Button>
-              </Link>
+              </Link>)}
             </div>
           </div>
         </div>

@@ -22,6 +22,10 @@ public class EventQueryService {
 
     @Transactional(readOnly = true)
     public PageResponse<EventSummary> searchPublic(EventQueryParams params) {
+        // If an organizer is looking at their own dashboard, don't restrict to PUBLISHED
+        if (params.getOrganizerId() != null) {
+            return search(params, false);
+        }
         return search(params, true);
     }
 

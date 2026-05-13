@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/feedback';
 import { EmptyState } from '@/components/ui/feedback';
 import { forumService } from '@/features/forums/service';
-import { eventsService } from '@/features/events/service';
+import { eventService } from '@/features/events/service';
 import { ForumResponse, MessageResponse } from '@/features/forums/types';
 import { ForumMessageCard } from '@/features/forums/components/ForumMessageCard';
 import { ForumComposer } from '@/features/forums/components/ForumComposer';
@@ -30,7 +30,7 @@ export default function EventForumPage({ params }: { params: Promise<{ slug: str
   const loadData = async () => {
     try {
       // 1. Get Event by slug to get UUID
-      const eventDetail = await eventsService.getBySlug(slug);
+      const eventDetail = await eventService.getBySlug(slug);
       setEventId(eventDetail.id);
       
       // 2. Get Forum & Messages

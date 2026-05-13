@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PublicShell } from '@/components/layout/PublicShell';
-import { categoriesService } from '@/features/categories/service';
+import { categoryService } from '@/features/categories/service';
 import { Spinner, EmptyState } from '@/components/ui/feedback';
 import Link from 'next/link';
 import { ArrowRight, LayoutGrid } from 'lucide-react';
@@ -12,7 +12,7 @@ export default function CategoriesPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    categoriesService.list()
+    categoryService.list()
       .then(res => setCategories(res))
       .catch(console.error)
       .finally(() => setIsLoading(false));

@@ -2,8 +2,8 @@
 
 import { use, useEffect, useState } from 'react';
 import { PublicShell } from '@/components/layout/PublicShell';
-import { eventsService } from '@/features/events/service';
-import { categoriesService } from '@/features/categories/service';
+import { eventService } from '@/features/events/service';
+import { categoryService } from '@/features/categories/service';
 import { EventCard } from '@/features/events/components/EventCard';
 import { Spinner, EmptyState } from '@/components/ui/feedback';
 import Link from 'next/link';
@@ -20,12 +20,12 @@ export default function CategoryDetailPage({ params }: { params: Promise<{ slug:
     const loadData = async () => {
       try {
         // 1. Get all categories to find the name/desc matching this slug
-        const cats = await categoriesService.list();
+        const cats = await categoryService.list();
         const found = cats.find(c => c.slug === slug);
         setCategory(found || { name: slug.replace('-', ' '), description: '' });
 
         // 2. Fetch events for this category
-        const res = await eventsService.list({ category: slug, page: 0, size: 50 });
+        const res = await eventService.list({ category: slug, page: 0, size: 50 });
         setEvents(res.content);
       } catch (err) {
         console.error(err);

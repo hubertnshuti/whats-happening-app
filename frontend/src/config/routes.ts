@@ -21,7 +21,7 @@ export const routes = {
   profile: "/profile",
   profileEdit: "/profile/edit",
   savedEvents: "/saved-events",
-  myEvents: "/my-events",
+  myEvents: "/organizer/events",
   createEvent: "/create-event",
   notifications: "/notifications",
   settings: "/settings",

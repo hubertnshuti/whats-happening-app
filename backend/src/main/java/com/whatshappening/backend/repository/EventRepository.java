@@ -26,4 +26,6 @@ public interface EventRepository
 
     long countByStatus(EventStatus status);
     long countByStatusAndStartAtAfter(EventStatus status, LocalDateTime from);
+    Page<Event> findByOrganizerId(UUID organizerId, Pageable pageable);
+
 }
