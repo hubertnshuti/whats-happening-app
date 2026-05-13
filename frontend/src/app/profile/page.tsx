@@ -56,17 +56,24 @@ export default function ProfilePage() {
                   <BadgeCheck className="size-5 text-info" aria-label="Verified" />
                 )}
               </div>
-              <p className="flex items-center gap-1.5 text-sm text-fg-tertiary">
-                <AtSign className="size-4" />
-                {user.username}
-              </p>
+              {user.username && (
+                <p className="flex items-center gap-1.5 text-sm text-fg-tertiary">
+                  <AtSign className="size-4" />
+                  {user.username}
+                </p>
+              )}
               <div className="flex flex-wrap items-center gap-2 pt-1">
-                <Chip variant="brand">
-                  <ShieldCheck className="size-3" /> {ROLE_LABELS[user.role]}
-                </Chip>
-                <Chip variant={user.status === "ACTIVE" ? "success" : "warning"}>
-                  {user.status}
-                </Chip>
+                {(user.roles ?? []).map((r) => (
+                  <Chip key={r} variant="brand">
+                    <ShieldCheck className="size-3" /> {ROLE_LABELS[r] ?? r}
+                  </Chip>
+                ))}
+                {(() => {
+                  const st = (user as any).accountStatus ?? user.status;
+                  return st ? (
+                    <Chip variant={st === "ACTIVE" ? "success" : "warning"}>{st}</Chip>
+                  ) : null;
+                })()}
               </div>
             </div>
           </div>
@@ -77,8 +84,8 @@ export default function ProfilePage() {
           <h3 className="mb-4 font-display text-base font-bold">Account details</h3>
           <dl className="space-y-4">
             <DetailRow icon={<Mail className="size-4" />} label="Email" value={user.email} />
-            <DetailRow icon={<AtSign className="size-4" />} label="Username" value={`@${user.username}`} />
-            <DetailRow icon={<ShieldCheck className="size-4" />} label="Role" value={ROLE_LABELS[user.role]} />
+            {user.username && <DetailRow icon={<AtSign className="size-4" />} label="Username" value={`@${user.username}`} />}
+            <DetailRow icon={<ShieldCheck className="size-4" />} label="Role" value={(user.roles ?? []).map((r) => ROLE_LABELS[r] ?? r).join(", ")} />
             <DetailRow icon={<Calendar className="size-4" />} label="Joined" value={formatRelative(user.createdAt)} />
           </dl>
         </Card>

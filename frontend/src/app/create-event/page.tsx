@@ -54,7 +54,8 @@ export default function CreateEventPage() {
     register, handleSubmit, watch, setValue, setError,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       title: "", shortDescription: "", description: "", categoryId: "",
       customLocationText: "", startAt: "", endAt: "", isFree: true,

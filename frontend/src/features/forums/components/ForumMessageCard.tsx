@@ -3,8 +3,8 @@
 import { formatRelative } from '@/lib/format';
 import { Avatar } from '@/components/ui/Avatar';
 import { Chip } from '@/components/ui/Chip';
-import { MessageResponse } from '../../types';
-import { AlertCircle, Bell, CalendarClock, Info, CheckCircle2 } from 'lucide-react';
+import { MessageResponse } from '../types';
+import { AlertCircle, Bell, CalendarClock, Info, CheckCircle2, MapPin } from 'lucide-react';
 
 interface Props {
   message: MessageResponse;
@@ -27,11 +27,7 @@ export function ForumMessageCard({ message }: Props) {
 
   return (
     <div className="flex gap-4 p-4 rounded-2xl bg-surface border border-line hover:shadow-sm transition-all duration-200">
-      <Avatar 
-        src={undefined} // Removed profileImageUrl as per CONTRACT.md
-        fallback={message.author.fullName.substring(0, 2).toUpperCase()} 
-        size="md" 
-      />
+      <Avatar src={undefined} name={message.author.fullName} size="md" />
       <div className="flex-1 space-y-2 overflow-hidden">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2">

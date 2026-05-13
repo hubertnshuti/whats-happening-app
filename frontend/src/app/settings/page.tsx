@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuthStore } from "@/store/authStore";
 import { useTheme } from "@/hooks/useTheme";
 import { routes } from "@/config/routes";
+import { isAdmin } from "@/lib/roles";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function SettingsPage() {
           <Link href={routes.notifications} className="block">
             <SettingsRow icon={<Bell className="size-4" />} label="Notifications" hint="Manage what you receive" />
           </Link>
-          {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+          {isAdmin(user) && (
             <Link href={routes.admin.dashboard} className="block">
               <SettingsRow icon={<Shield className="size-4" />} label="Admin dashboard" hint="Platform management" />
             </Link>

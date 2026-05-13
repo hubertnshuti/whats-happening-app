@@ -10,6 +10,7 @@ import { Eye, EyeOff, Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { ApiException } from "@/lib/ApiException";
 import { routes } from "@/config/routes";
+import { isAdmin } from "@/lib/roles";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
@@ -38,7 +39,8 @@ export default function LoginPage() {
     setServerError(null);
     try {
       await login(values);
-      router.push(routes.home);
+      const { user } = useAuthStore.getState();
+      router.push(isAdmin(user) ? routes.admin.dashboard : routes.home);
     } catch (err) {
       if (err instanceof ApiException) {
         if (err.errors.length > 0) {

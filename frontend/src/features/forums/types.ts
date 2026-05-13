@@ -1,4 +1,4 @@
-import { UserResponse } from '@/types/domain'; // Adjust import path if needed based on your project
+import type { UserSummary } from '@/types/domain';
 
 export type ForumStatus = 'ACTIVE' | 'READ_ONLY' | 'ARCHIVED' | 'DISABLED';
 export type MessageType = 'GENERAL' | 'IMPORTANT' | 'REMINDER' | 'UPDATE' | 'VENUE_CHANGE' | 'TIME_CHANGE' | 'CANCELLED' | 'RESOURCE' | 'POST_EVENT';
@@ -16,7 +16,7 @@ export interface MessageResponse {
   id: string;
   content: string;
   messageType: MessageType;
-  author: UserResponse; 
+  author: UserSummary; 
   createdAt: string;
   reactions: Record<string, number>;
 }
@@ -24,9 +24,9 @@ export interface MessageResponse {
 export interface QuestionResponse {
   id: string;
   content: string;
-  asker: UserResponse;
+  asker: UserSummary;
   answer?: string;
-  answeredBy?: UserResponse;
+  answeredBy?: UserSummary;
   answeredAt?: string;
   createdAt: string;
 }

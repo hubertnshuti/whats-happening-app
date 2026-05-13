@@ -18,6 +18,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { useAuthStore } from "@/store/authStore";
 import { routes } from "@/config/routes";
+import { isAdmin, isOrganizerOrAbove } from "@/lib/roles";
 
 export function UserMenu() {
   const router = useRouter();
@@ -69,12 +70,8 @@ export function UserMenu() {
     );
   }
 
-  const isOrganizerOrAbove =
-    user.role === "ORGANIZER" ||
-    user.role === "ADMIN" ||
-    user.role === "MODERATOR" ||
-    user.role === "SUPER_ADMIN";
-  const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+  const userIsAdmin = isAdmin(user);
+  const userIsOrganizerOrAbove = isOrganizerOrAbove(user);
 
   return (
     <div ref={ref} className="relative">
@@ -98,7 +95,7 @@ export function UserMenu() {
         >
           <div className="border-b border-line-subtle px-3 py-3">
             <p className="truncate text-sm font-semibold">{user.fullName}</p>
-            <p className="truncate text-xs text-fg-tertiary">@{user.username}</p>
+            {user.username && <p className="truncate text-xs text-fg-tertiary">@{user.username}</p>}
           </div>
 
           <div className="py-1.5">
@@ -116,9 +113,9 @@ export function UserMenu() {
             </MenuLink>
           </div>
 
-          {(isOrganizerOrAbove || isAdmin) && (
+          {(userIsOrganizerOrAbove || userIsAdmin) && (
             <div className="border-t border-line-subtle py-1.5">
-              {isOrganizerOrAbove && (
+              {userIsOrganizerOrAbove && (
                 <MenuLink
                   href={routes.organizer.dashboard}
                   icon={<Calendar className="size-4" />}
@@ -126,7 +123,7 @@ export function UserMenu() {
                   Organizer dashboard
                 </MenuLink>
               )}
-              {isAdmin && (
+              {userIsAdmin && (
                 <MenuLink
                   href={routes.admin.dashboard}
                   icon={<Shield className="size-4" />}

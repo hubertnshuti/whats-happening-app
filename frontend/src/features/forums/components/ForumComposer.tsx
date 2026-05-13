@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { forumService } from '../../service';
-import { MessageType } from '../../types';
+import { forumService } from '../service';
+import { MessageType } from '../types';
 import { Send, Loader2 } from 'lucide-react';
 
 interface Props {

@@ -30,7 +30,7 @@ export default function EventForumPage({ params }: { params: Promise<{ slug: str
   const loadData = async () => {
     try {
       // 1. Get Event by slug to get UUID
-      const eventDetail = await eventService.getBySlug(slug);
+      const eventDetail = await eventService.bySlug(slug);
       setEventId(eventDetail.id);
       
       // 2. Get Forum & Messages

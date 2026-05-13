@@ -6,8 +6,8 @@ import { PublicShell } from '@/components/layout/PublicShell';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Spinner, EmptyState } from '@/components/ui/feedback';
-import { eventsService } from '@/features/events/service';
-import api from '@/lib/api';
+import { eventService } from '@/features/events/service';
+import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { ArrowLeft, Save, Globe, Ban, Trash2 } from 'lucide-react';
 import Link from 'next/link';
@@ -15,7 +15,8 @@ import Link from 'next/link';
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { user, isHydrated } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
   
   const [event, setEvent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +28,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
 
   useEffect(() => {
     if (!isHydrated) return;
-    eventsService.getById(id)
+    eventService.byId(id)
       .then(data => {
         setEvent(data);
         setTitle(data.title);

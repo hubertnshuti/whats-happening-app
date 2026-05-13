@@ -6,7 +6,10 @@
       "Bash(Format-Table -AutoSize)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(Get-ChildItem -Recurse -Filter \"*.java\")"
+      "Bash(Get-ChildItem -Recurse -Filter \"*.java\")",
+      "Bash(npm run *)",
+      "Bash(npm dedupe *)",
+      "Bash(npm ls *)"
     ]
   }
 }
