@@ -19,7 +19,8 @@
       "PowerShell(netstat *)",
       "PowerShell(Stop-Process *)",
       "Bash(./mvnw.cmd spring-boot:run -q)",
-      "Bash(echo \"Backend starting in background, PID: $!\")"
+      "Bash(echo \"Backend starting in background, PID: $!\")",
+      "Bash(python3 -m json.tool)"
     ]
   }
 }
