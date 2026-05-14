@@ -13,6 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +33,23 @@ public class EventService {
     private final SlugService slugService;
 //    This is to add forum upon event creation
     private final ForumService forumService;
+
+
+    @Transactional(readOnly = true)
+    public Page<EventSummary> listEvents(UUID organizerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Event> eventPage;
+
+        if (organizerId != null) {
+            // If the frontend sends an organizerId, return ALL their events (including Drafts)
+            eventPage = eventRepository.findByOrganizerId(organizerId, pageable);
+        } else {
+            // If it's the public search, ONLY show PUBLISHED events
+            eventPage = eventRepository.findByStatus(EventStatus.PUBLISHED, pageable);
+        }
+
+        return eventPage.map(this::toSummary);
+    }
 
     @Transactional
     public EventResponse createEvent(CreateEventRequest req, User organizer) {
