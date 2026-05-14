@@ -6,6 +6,7 @@ import com.whatshappening.backend.entity.*;
 import com.whatshappening.backend.exception.ApiException;
 import com.whatshappening.backend.exception.ResourceNotFoundException;
 import com.whatshappening.backend.repository.CategoryRepository;
+import com.whatshappening.backend.repository.EventForumRepository;
 import com.whatshappening.backend.repository.EventRepository;
 import com.whatshappening.backend.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,8 @@ public class EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
+    private final EventForumRepository eventForumRepository;
     private final SlugService slugService;
-//    This is to add forum upon event creation
     private final ForumService forumService;
 
 
@@ -76,7 +77,7 @@ public class EventService {
                 .startAt(req.getStartAt())
                 .endAt(req.getEndAt())
                 .coverImageUrl(req.getCoverImageUrl())
-                .status(EventStatus.DRAFT)
+                .status(EventStatus.PUBLISHED)
                 .capacity(req.getCapacity())
                 .isFree(req.getIsFree() == null || req.getIsFree())
                 .priceInfo(req.getPriceInfo())
@@ -85,6 +86,7 @@ public class EventService {
                 .build();
 
         Event saved = eventRepository.save(event);
+        forumService.ensureForumForEvent(saved);
         return toResponse(saved);
     }
 
@@ -150,8 +152,8 @@ public class EventService {
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         ensureCanModify(event, currentUser);
 
-        if (event.getStatus() != EventStatus.DRAFT) {
-            throw new ApiException("Only draft events can be published", HttpStatus.BAD_REQUEST);
+        if (event.getStatus() == EventStatus.CANCELLED || event.getStatus() == EventStatus.COMPLETED) {
+            throw new ApiException("Cannot publish a " + event.getStatus() + " event", HttpStatus.BAD_REQUEST);
         }
         event.setStatus(EventStatus.PUBLISHED);
         forumService.ensureForumForEvent(event);
@@ -209,6 +211,9 @@ public class EventService {
     }
 
     public EventResponse toResponse(Event e) {
+        UUID forumId = eventForumRepository.findByEventId(e.getId())
+                .map(f -> f.getId())
+                .orElse(null);
         return EventResponse.builder()
                 .id(e.getId())
                 .title(e.getTitle())
@@ -230,6 +235,7 @@ public class EventService {
                 .organizer(toUserResponse(e.getOrganizer()))
                 .createdAt(e.getCreatedAt())
                 .updatedAt(e.getUpdatedAt())
+                .forumId(forumId)
                 .build();
     }
 

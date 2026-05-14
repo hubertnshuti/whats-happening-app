@@ -13,11 +13,14 @@ import {
   UserPlus,
   ChevronDown,
   Shield,
+  Bell,
 } from "lucide-react";
+import { notificationService } from "@/features/notifications/service";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { useAuthStore } from "@/store/authStore";
 import { routes } from "@/config/routes";
+import { isAdmin, isOrganizerOrAbove } from "@/lib/roles";
 
 export function UserMenu() {
   const router = useRouter();
@@ -51,6 +54,15 @@ export function UserMenu() {
     router.push(routes.home);
   }
 
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    notificationService.unreadCount()
+      .then(d => setUnread(Number(d.count ?? 0)))
+      .catch(() => {});
+  }, [user?.id]);
+
   // Logged-out state — show sign in / sign up
   if (!user) {
     return (
@@ -69,12 +81,8 @@ export function UserMenu() {
     );
   }
 
-  const isOrganizerOrAbove =
-    user.role === "ORGANIZER" ||
-    user.role === "ADMIN" ||
-    user.role === "MODERATOR" ||
-    user.role === "SUPER_ADMIN";
-  const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+  const userIsAdmin = isAdmin(user);
+  const userIsOrganizerOrAbove = isOrganizerOrAbove(user);
 
   return (
     <div ref={ref} className="relative">
@@ -98,12 +106,22 @@ export function UserMenu() {
         >
           <div className="border-b border-line-subtle px-3 py-3">
             <p className="truncate text-sm font-semibold">{user.fullName}</p>
-            <p className="truncate text-xs text-fg-tertiary">@{user.username}</p>
+            {user.username && <p className="truncate text-xs text-fg-tertiary">@{user.username}</p>}
           </div>
 
           <div className="py-1.5">
             <MenuLink href={routes.profile} icon={<User className="size-4" />}>
               Profile
+            </MenuLink>
+            <MenuLink href={routes.notifications} icon={<Bell className="size-4" />}>
+              <span className="flex items-center justify-between w-full">
+                Notifications
+                {unread > 0 && (
+                  <span className="ml-auto rounded-pill bg-brand px-1.5 py-0.5 text-[10px] font-bold text-fg-on-brand">
+                    {unread}
+                  </span>
+                )}
+              </span>
             </MenuLink>
             <MenuLink href={routes.savedEvents} icon={<Bookmark className="size-4" />}>
               Saved events
@@ -116,9 +134,9 @@ export function UserMenu() {
             </MenuLink>
           </div>
 
-          {(isOrganizerOrAbove || isAdmin) && (
+          {(userIsOrganizerOrAbove || userIsAdmin) && (
             <div className="border-t border-line-subtle py-1.5">
-              {isOrganizerOrAbove && (
+              {userIsOrganizerOrAbove && (
                 <MenuLink
                   href={routes.organizer.dashboard}
                   icon={<Calendar className="size-4" />}
@@ -126,7 +144,7 @@ export function UserMenu() {
                   Organizer dashboard
                 </MenuLink>
               )}
-              {isAdmin && (
+              {userIsAdmin && (
                 <MenuLink
                   href={routes.admin.dashboard}
                   icon={<Shield className="size-4" />}

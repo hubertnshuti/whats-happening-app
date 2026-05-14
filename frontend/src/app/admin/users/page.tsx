@@ -7,12 +7,14 @@ import { Spinner, EmptyState } from '@/components/ui/feedback';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
+import { isAdmin } from '@/lib/roles';
 import { Users, Shield, Ban, CheckCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminUsersPage() {
   const router = useRouter();
-  const { user, isHydrated } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
@@ -26,10 +28,8 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     if (!isHydrated) return;
-    if (!user?.roles.includes('ADMIN') && !user?.roles.includes('SUPER_ADMIN')) {
-      router.replace('/unauthorized');
-      return;
-    }
+    if (!user) { router.replace('/login'); return; }
+    if (!isAdmin(user)) { router.replace('/'); return; }
     loadUsers();
   }, [isHydrated, user, router]);
 

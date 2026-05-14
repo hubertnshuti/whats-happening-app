@@ -60,31 +60,48 @@ public class ForumService {
         });
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ForumResponse getForumForEvent(UUID eventId, User currentUser) {
         EventForum forum = forumRepository.findByEventId(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Forum not found"));
+        boolean isOrganizer = currentUser != null &&
+                forum.getEvent().getOrganizer().getId().equals(currentUser.getId());
         boolean isMember = currentUser != null && memberRepository.existsByForumAndUser(forum, currentUser);
-        return ForumResponse.from(forum, isMember);
+
+        // Auto-enroll organizer as ADMIN if they're somehow missing from forum_members
+        if (isOrganizer && !isMember) {
+            ForumMember organizerMember = ForumMember.builder()
+                    .id(new ForumMemberId(forum.getId(), currentUser.getId()))
+                    .forum(forum)
+                    .user(currentUser)
+                    .role(ForumMember.Role.ADMIN)
+                    .build();
+            memberRepository.save(organizerMember);
+            forum.setMemberCount(forum.getMemberCount() + 1);
+            isMember = true;
+        }
+
+        return ForumResponse.from(forum, isMember, isOrganizer);
     }
 
     @Transactional
     public ForumResponse joinForum(UUID eventId, User user) {
         EventForum forum = requireActiveForum(eventId);
 
+        boolean isOrganizer = forum.getEvent().getOrganizer().getId().equals(user.getId());
         if (memberRepository.existsByForumAndUser(forum, user)) {
-            return ForumResponse.from(forum, true);
+            return ForumResponse.from(forum, true, isOrganizer);
         }
 
         ForumMember member = ForumMember.builder()
                 .id(new ForumMemberId(forum.getId(), user.getId()))
                 .forum(forum)
                 .user(user)
-                .role(ForumMember.Role.MEMBER)
+                .role(isOrganizer ? ForumMember.Role.ADMIN : ForumMember.Role.MEMBER)
                 .build();
         memberRepository.save(member);
         forum.setMemberCount(forum.getMemberCount() + 1);
-        return ForumResponse.from(forum, true);
+        return ForumResponse.from(forum, true, isOrganizer);
     }
 
     @Transactional
@@ -117,7 +134,7 @@ public class ForumService {
 
 //        this code block before return statement is for notification
 
-        String linkUrl = "/events/" + forum.getEvent().getId();
+        String linkUrl = "/events/" + forum.getEvent().getSlug() + "/forum";
         for (ForumMember m : memberRepository.findByForumAndNotificationsEnabledTrue(forum)) {
             if (!m.getUser().getId().equals(author.getId())) { // don't notify yourself
                 notificationService.notify(
@@ -191,6 +208,20 @@ public class ForumService {
                 .build();
         ForumQuestion saved = questionRepository.save(q);
         forum.setLastActivityAt(LocalDateTime.now());
+
+        // Notify the event organizer
+        User organizer = forum.getEvent().getOrganizer();
+        if (!organizer.getId().equals(asker.getId())) {
+            notificationService.notify(
+                    organizer,
+                    Notification.Type.FORUM_MESSAGE,
+                    asker.getFullName() + " asked a question in " + forum.getEvent().getTitle(),
+                    req.getQuestion().length() > 200 ? req.getQuestion().substring(0, 200) + "…" : req.getQuestion(),
+                    "/events/" + forum.getEvent().getSlug() + "/forum",
+                    forum.getEvent()
+            );
+        }
+
         return toQuestionResponse(saved);
     }
 
@@ -213,7 +244,7 @@ public class ForumService {
                 Notification.Type.FORUM_QUESTION_ANSWERED,
                 "Your question was answered",
                 req.getAnswer().length() > 200 ? req.getAnswer().substring(0, 200) + "…" : req.getAnswer(),
-                "/events/" + q.getForum().getEvent().getId(),
+                "/events/" + q.getForum().getEvent().getSlug() + "/forum",
                 q.getForum().getEvent()
         );
 

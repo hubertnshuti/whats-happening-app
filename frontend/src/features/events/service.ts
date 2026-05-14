@@ -19,9 +19,25 @@ export interface CreateEventBody {
   externalUrl?: string;
 }
 
+function mapSort(sort?: string): string {
+  switch (sort) {
+    case "newest":    return "createdAt,desc";
+    case "popular":   return "viewCount,desc";
+    case "most-saved":return "viewCount,desc";
+    default:          return "startAt,asc"; // "upcoming"
+  }
+}
+
 export const eventService = {
-  list: (params?: EventListParams) =>
-    api.get<PageResponse<EventSummary>>("/events", params),
+  list: (params?: EventListParams) => {
+    const { search, category, sort, status, ...rest } = params ?? {};
+    return api.get<PageResponse<EventSummary>>("/events", {
+      ...rest,
+      ...(search ? { q: search } : {}),
+      ...(category ? { categorySlug: category } : {}),
+      sort: mapSort(sort),
+    });
+  },
 
   bySlug: (slug: string) => api.get<EventDetail>(`/events/slug/${slug}`),
 

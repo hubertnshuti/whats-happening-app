@@ -26,12 +26,13 @@ export interface AuthTokens {
 export interface AuthUser {
   id: string;
   fullName: string;
-  username: string;
+  username?: string;
   email: string;
-  role: Role;
-  status: AccountStatus;
+  roles: Role[];
+  /** Backend sends accountStatus — map defensively with (user as any).accountStatus ?? user.status */
+  status?: AccountStatus;
   emailVerified: boolean;
-  profileImageUrl: string | null;
+  profileImageUrl?: string | null;
   createdAt: string;
 }
 

@@ -83,15 +83,12 @@ export type CommentStatus = "VISIBLE" | "HIDDEN" | "DELETED" | "REPORTED";
 
 // ── Notification ─────────────────────────────────────────────────────────────
 export type NotificationType =
+  | "EVENT_PUBLISHED"
   | "EVENT_REMINDER"
-  | "FORUM_ANNOUNCEMENT"
-  | "EVENT_UPDATE"
+  | "EVENT_UPDATED"
   | "EVENT_CANCELLED"
-  | "QUESTION_ANSWERED"
-  | "EVENT_APPROVED"
-  | "EVENT_REJECTED"
-  | "FORUM_ARCHIVE_WARNING"
-  | "COMMENT_REPLY";
+  | "FORUM_MESSAGE"
+  | "FORUM_QUESTION_ANSWERED";
 
 // ── Reaction ─────────────────────────────────────────────────────────────────
 export type ReactionType = "LIKE" | "LOVE" | "FIRE" | "CLAP" | "WOW";

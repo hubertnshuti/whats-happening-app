@@ -53,7 +53,7 @@ export interface EventDetail extends EventSummary {
 
 export type EventSort = "upcoming" | "newest" | "popular" | "most-saved";
 
-export interface EventListParams {
+export interface EventListParams extends Record<string, unknown> {
   page?: number;
   size?: number;
   sort?: EventSort;

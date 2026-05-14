@@ -62,7 +62,7 @@ axiosInstance.interceptors.response.use(
     const { status, data } = error.response;
 
     if (
-      status === 401 &&
+      (status === 401 || status === 403) &&
       !original._retried &&
       !original.url?.includes("/auth/")
     ) {

@@ -11,9 +11,10 @@ public class NotificationResponse {
     private UUID id;
     private String type;
     private String title;
-    private String body;
-    private String linkUrl;
+    private String message;
+    private String link;
     private UUID relatedEventId;
+    private String eventSlug;
     private boolean read;
     private LocalDateTime createdAt;
 
@@ -22,9 +23,10 @@ public class NotificationResponse {
                 .id(n.getId())
                 .type(n.getType().name())
                 .title(n.getTitle())
-                .body(n.getBody())
-                .linkUrl(n.getLinkUrl())
+                .message(n.getBody())
+                .link(n.getLinkUrl())
                 .relatedEventId(n.getRelatedEvent() != null ? n.getRelatedEvent().getId() : null)
+                .eventSlug(n.getRelatedEvent() != null ? n.getRelatedEvent().getSlug() : null)
                 .read(n.isRead())
                 .createdAt(n.getCreatedAt())
                 .build();
