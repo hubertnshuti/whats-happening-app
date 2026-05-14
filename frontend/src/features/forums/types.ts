@@ -1,5 +1,3 @@
-import type { UserSummary } from '@/types/domain';
-
 export type ForumStatus = 'ACTIVE' | 'READ_ONLY' | 'ARCHIVED' | 'DISABLED';
 export type MessageType = 'GENERAL' | 'IMPORTANT' | 'REMINDER' | 'UPDATE' | 'VENUE_CHANGE' | 'TIME_CHANGE' | 'CANCELLED' | 'RESOURCE' | 'POST_EVENT';
 
@@ -8,7 +6,8 @@ export interface ForumResponse {
   eventId: string;
   eventTitle: string;
   status: ForumStatus;
-  isMember: boolean;
+  member: boolean;      // Jackson strips "is" prefix: isMember -> "member"
+  organizer: boolean;   // Jackson strips "is" prefix: isOrganizer -> "organizer"
   memberCount?: number;
 }
 
@@ -16,17 +15,20 @@ export interface MessageResponse {
   id: string;
   content: string;
   messageType: MessageType;
-  author: UserSummary; 
+  authorId: string;
+  authorName: string;
+  pinned: boolean;
   createdAt: string;
   reactions: Record<string, number>;
 }
 
 export interface QuestionResponse {
   id: string;
-  content: string;
-  asker: UserSummary;
+  question: string;
+  askerName: string;
   answer?: string;
-  answeredBy?: UserSummary;
+  answeredByName?: string;
   answeredAt?: string;
+  status: string;
   createdAt: string;
 }

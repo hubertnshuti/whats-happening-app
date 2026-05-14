@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Bell,
-  BellOff,
   CheckCheck,
   Calendar,
   MessageSquare,
@@ -31,15 +30,12 @@ const TYPE_META: Record<
   NotificationType,
   { icon: React.ReactNode; tone: string }
 > = {
-  EVENT_REMINDER:        { icon: <Calendar className="size-4" />,    tone: "bg-info-soft text-info" },
-  FORUM_ANNOUNCEMENT:    { icon: <Megaphone className="size-4" />,   tone: "bg-brand-soft text-brand" },
-  EVENT_UPDATE:          { icon: <AlertCircle className="size-4" />, tone: "bg-warning-soft text-warning" },
-  EVENT_CANCELLED:       { icon: <AlertCircle className="size-4" />, tone: "bg-danger-soft text-danger" },
-  QUESTION_ANSWERED:     { icon: <MessageSquare className="size-4" />,tone: "bg-success-soft text-success" },
-  EVENT_APPROVED:        { icon: <CheckCheck className="size-4" />,  tone: "bg-success-soft text-success" },
-  EVENT_REJECTED:        { icon: <AlertCircle className="size-4" />, tone: "bg-danger-soft text-danger" },
-  FORUM_ARCHIVE_WARNING: { icon: <BellOff className="size-4" />,     tone: "bg-warning-soft text-warning" },
-  COMMENT_REPLY:         { icon: <MessageSquare className="size-4" />,tone: "bg-info-soft text-info" },
+  EVENT_PUBLISHED:         { icon: <CheckCheck className="size-4" />,   tone: "bg-success-soft text-success" },
+  EVENT_REMINDER:          { icon: <Calendar className="size-4" />,     tone: "bg-info-soft text-info" },
+  EVENT_UPDATED:           { icon: <AlertCircle className="size-4" />,  tone: "bg-warning-soft text-warning" },
+  EVENT_CANCELLED:         { icon: <AlertCircle className="size-4" />,  tone: "bg-danger-soft text-danger" },
+  FORUM_MESSAGE:           { icon: <Megaphone className="size-4" />,    tone: "bg-brand-soft text-brand" },
+  FORUM_QUESTION_ANSWERED: { icon: <MessageSquare className="size-4" />,tone: "bg-success-soft text-success" },
 };
 
 export default function NotificationsPage() {
@@ -142,10 +138,8 @@ export default function NotificationsPage() {
         ) : (
           <ul className="space-y-2">
             {items.map((n) => {
-              const meta = TYPE_META[n.type] ?? TYPE_META.EVENT_UPDATE;
-              const linkHref = n.eventSlug
-                ? routes.event(n.eventSlug)
-                : n.link ?? "#";
+              const meta = TYPE_META[n.type] ?? TYPE_META.EVENT_UPDATED;
+              const linkHref = n.link ?? (n.eventSlug ? routes.event(n.eventSlug) : "#");
               return (
                 <li key={n.id}>
                   <Link

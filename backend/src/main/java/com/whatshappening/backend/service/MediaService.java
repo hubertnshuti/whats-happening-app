@@ -1,24 +1,28 @@
 package com.whatshappening.backend.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.whatshappening.backend.exception.ApiException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class MediaService {
 
-    private final Cloudinary cloudinary;
+    @Value("${app.upload.dir:${user.home}/whats-happening-uploads}")
+    private String uploadDir;
+
+    @Value("${app.upload.base-url:http://localhost:8084}")
+    private String baseUrl;
 
     private static final List<String> ALLOWED_TYPES = List.of(
             "image/jpeg", "image/png", "image/webp", "image/gif"
@@ -28,24 +32,17 @@ public class MediaService {
     public String uploadImage(MultipartFile file, String folder) {
         validate(file);
         try {
-            Map<?, ?> result = cloudinary.uploader().upload(
-                    file.getBytes(),
-                    ObjectUtils.asMap(
-                            "folder", "whats-happening/" + folder,
-                            "resource_type", "image",
-                            "transformation", ObjectUtils.asMap(
-                                    "quality", "auto",
-                                    "fetch_format", "auto"
-                            )
-                    )
-            );
-            String url = (String) result.get("secure_url");
-            if (url == null) {
-                throw new ApiException("Upload failed", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            return url;
+            Path dir = Paths.get(uploadDir, folder);
+            Files.createDirectories(dir);
+
+            String ext = getExtension(file.getOriginalFilename());
+            String filename = UUID.randomUUID() + "." + ext;
+            Path dest = dir.resolve(filename);
+            file.transferTo(dest.toFile());
+
+            return baseUrl + "/uploads/" + folder + "/" + filename;
         } catch (IOException e) {
-            log.error("Cloudinary upload failed", e);
+            log.error("File upload failed", e);
             throw new ApiException("Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -61,5 +58,11 @@ public class MediaService {
         if (contentType == null || !ALLOWED_TYPES.contains(contentType.toLowerCase())) {
             throw new ApiException("Only JPG, PNG, WebP, and GIF images are allowed", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private String getExtension(String filename) {
+        if (filename == null) return "jpg";
+        int dot = filename.lastIndexOf('.');
+        return dot >= 0 ? filename.substring(dot + 1).toLowerCase() : "jpg";
     }
 }

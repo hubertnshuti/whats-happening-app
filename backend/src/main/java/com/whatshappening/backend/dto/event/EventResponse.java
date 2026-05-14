@@ -32,4 +32,5 @@ public class EventResponse {
     private UserResponse organizer;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private UUID forumId;
 }

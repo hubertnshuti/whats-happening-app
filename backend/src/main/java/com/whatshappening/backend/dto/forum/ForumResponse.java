@@ -15,8 +15,9 @@ public class ForumResponse {
     private int memberCount;
     private LocalDateTime lastActivityAt;
     private boolean isMember;
+    private boolean isOrganizer;
 
-    public static ForumResponse from(EventForum f, boolean isMember) {
+    public static ForumResponse from(EventForum f, boolean isMember, boolean isOrganizer) {
         return ForumResponse.builder()
                 .id(f.getId())
                 .eventId(f.getEvent().getId())
@@ -25,6 +26,7 @@ public class ForumResponse {
                 .memberCount(f.getMemberCount())
                 .lastActivityAt(f.getLastActivityAt())
                 .isMember(isMember)
+                .isOrganizer(isOrganizer)
                 .build();
     }
 }

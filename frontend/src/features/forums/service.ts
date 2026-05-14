@@ -26,4 +26,10 @@ export const forumService = {
 
   getQuestions: (eventId: string, page = 0, size = 50) =>
     api.get<PageResponse<QuestionResponse>>(`/events/${eventId}/forum/questions`, { page, size }),
+
+  askQuestion: (eventId: string, question: string) =>
+    api.post<QuestionResponse>(`/events/${eventId}/forum/questions`, { question }),
+
+  answerQuestion: (questionId: string, answer: string) =>
+    api.post<QuestionResponse>(`/forum/questions/${questionId}/answer`, { answer }),
 };

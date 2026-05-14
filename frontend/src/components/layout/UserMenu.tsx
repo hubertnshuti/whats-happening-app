@@ -13,7 +13,9 @@ import {
   UserPlus,
   ChevronDown,
   Shield,
+  Bell,
 } from "lucide-react";
+import { notificationService } from "@/features/notifications/service";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { useAuthStore } from "@/store/authStore";
@@ -51,6 +53,15 @@ export function UserMenu() {
     await logout();
     router.push(routes.home);
   }
+
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    notificationService.unreadCount()
+      .then(d => setUnread(Number(d.count ?? 0)))
+      .catch(() => {});
+  }, [user?.id]);
 
   // Logged-out state — show sign in / sign up
   if (!user) {
@@ -101,6 +112,16 @@ export function UserMenu() {
           <div className="py-1.5">
             <MenuLink href={routes.profile} icon={<User className="size-4" />}>
               Profile
+            </MenuLink>
+            <MenuLink href={routes.notifications} icon={<Bell className="size-4" />}>
+              <span className="flex items-center justify-between w-full">
+                Notifications
+                {unread > 0 && (
+                  <span className="ml-auto rounded-pill bg-brand px-1.5 py-0.5 text-[10px] font-bold text-fg-on-brand">
+                    {unread}
+                  </span>
+                )}
+              </span>
             </MenuLink>
             <MenuLink href={routes.savedEvents} icon={<Bookmark className="size-4" />}>
               Saved events
